@@ -1,0 +1,31 @@
+language: generic
+sudo: required
+services:
+  - docker
+before_install:
+  - docker build -t buddhamagnet/multi-react -f client/Dockerfile.dev ./client
+script:
+  - docker run -e CI=true buddhamagnet/multi-react yarn test --coverage
+after_success:
+  - docker build -t buddhamagnet/multi-react ./client
+  - docker build -t buddhamagnet/multi-api ./api
+  - docker build -t buddhamagnet/multi-worker ./worker
+  - docker build -t buddhamagnet/multi-facade ./facade
+  - echo "$hubpw" | docker login -u "$hubuser" --password-stdin
+  - docker push buddhamagnet/multi-react
+  - docker push buddhamagnet/multi-api
+  - docker push buddhamagnet/multi-worker
+  - docker push buddhamagnet/multi-facade
+deploy:
+  provider: elasticbeanstalk
+  edge: true
+  region: "us-east-1"
+  app: multi-docker
+  env: MultiDocker-env
+  bucket_name: elasticbeanstalk-us-east-1-771301212860
+  bucket_path: multi-docker
+  access_key_id: <REDACTED>
+  secret_access_key:
+    secure: "njuX6lc9SpIYBURiaJjaRB1WJnxjPv64wUVBe+SlpWZwhqHj0GuhuId7hEyfd4/8SCHTA5N11QTXH2OJXMJQugMi9dwq/5hIUSAHRSty8bNn1uv/y8FuRosKrY1T0ThSef+HkZZ+rpPK+4IahqKh6+3u1ZhzVQx2zuR/yhfr5OFCoZpLSDdrJNhEkFP4O1f2R8DFIM1IcIrLX0OpbBPLTto3NsKEXw+8Qcei33kft193KbQ236VDZjG9GNyDHOJ+5XDDufXVRwxBGIc/qVdiMEqUL/7vhn2Hgbm3kmDvOAREfNdDIQiQky2F666GeNAfU+/aE1tdG+EDFRwmkki7rWtzePBClcST+p2s2bLAW6MZrzYkLdRE8pc2q+4QUvIQuG33Upj0orVlbrUru6yxffgKJJ925R5aBRxfFS2UpqePAt19mUj6zLRp6GpItG5ypX++zLNzzORJdbaBEPUym/ZMW4AIBJ0CHu4pYlhvRuESyd3C1SIbpifGiT+gz4rQ1Tz6kbvB46MOu6JqnvuNZA5Gdw0tq8FIj5ZpeIpUyiZEC+OIptGkUhpyE7LZ8Et6kRQiE4K9XphJwg6wyaEORg0RPWEHgN9kKLqTOnx3iB4LTdzrZm0xE9vFu1x5HDBC5Xlhby1IcbjWe85gTj+uYnNsgqZvNdesxO+9y1rLqP4="
+  on:
+    branch: master

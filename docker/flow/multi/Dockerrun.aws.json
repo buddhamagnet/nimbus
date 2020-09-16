@@ -1,0 +1,38 @@
+{
+  "AWSEBDockerrunVersion": 2,
+  "containerDefinitions": [
+    {
+      "name": "multi-react",
+      "image": "buddhamagnet/multi-react",
+      "hostname": "client",
+      "essential": false,
+      "memory": 128
+    },
+    {
+      "name": "multi-api",
+      "image": "buddhamagnet/multi-api",
+      "hostname": "api",
+      "essential": false,
+      "memory": 128
+    },
+    {
+      "name": "multi-worker",
+      "image": "buddhamagnet/multi-worker",
+      "essential": false,
+      "memory": 128
+    },
+    {
+      "name": "multi-facade",
+      "image": "buddhamagnet/multi-facade",
+      "essential": true,
+      "memory": 128,
+      "portMappings": [
+        {
+          "hostPort": 80,
+          "containerPort": 80
+        }
+      ],
+      "links": ["multi-react", "multi-api"]
+    }
+  ]
+}

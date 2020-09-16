@@ -1,0 +1,10 @@
+version: '3'
+services:
+  redis-server:
+    image: 'redis'
+  node-app:
+    build: .
+    restart: always
+    ports:
+      - "3005:3005"
+  

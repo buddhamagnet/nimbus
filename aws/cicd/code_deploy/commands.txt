@@ -1,0 +1,21 @@
+# Create EC2 service role with S3 access
+# Create CodeDeploy service role with EC2 perms (load balancers etc).
+# Create EC2 istance with S3 role.
+
+# EC2 - install CodeDeploy agent on your EC2 instance:
+
+sudo yum update
+sudo yum install ruby
+sudo yum install wget
+cd /home/ec2-user
+wget https://aws-codedeploy-eu-west-1.s3.amazonaws.com/latest/install
+chmod +x ./install
+sudo ./install auto
+sudo service codedeploy-agent status
+
+# Local - create your application.zip and load it into CodeDeploy:
+
+aws deploy create-application --application-name MyWebApp
+aws deploy push --application-name MyWebApp --s3-location s3://buddha-code-deploy/webapp.zip --ignore-hidden-files
+
+# Console - create depoyment group and configuration.
